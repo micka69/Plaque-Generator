@@ -1,0 +1,479 @@
+ 
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Générateur de Plaques d'Immatriculation Ultime</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&display=swap');
+
+        body {
+            font-family: 'Roboto Mono', monospace;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background-color: #0a0a0a;
+            color: #cccccc;
+        }
+        .container {
+            text-align: center;
+            background-color: #131313;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            max-width: 900px;
+            width: 100%;
+        }
+        #plaque {
+            font-size: 48px;
+            font-weight: 700;
+            background-color: #1c1c1c;
+            color: #e0e0e0;
+            padding: 20px 30px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            transition: all 0.3s ease;
+            letter-spacing: 4px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            cursor: pointer;
+            user-select: none;
+        }
+        #plaque:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+        }
+        .buttons {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+        button {
+            font-size: 12px;
+            font-weight: 600;
+            padding: 8px 16px;
+            cursor: pointer;
+            background-color: #2a2a2a;
+            color: #cccccc;
+            border: none;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        button:hover {
+            background-color: #3a3a3a;
+            transform: translateY(-2px);
+        }
+        button:active {
+            transform: translateY(1px);
+        }
+        #copyMessage {
+            margin-top: 15px;
+            color: #4CAF50;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 10px;
+            margin-top: 20px;
+            text-align: left;
+        }
+        .option {
+            display: flex;
+            align-items: center;
+        }
+        .option input[type="checkbox"] {
+            margin-right: 5px;
+        }
+        .option input[type="number"], .option select {
+            width: 50px;
+            margin-left: 5px;
+            background-color: #2a2a2a;
+            color: #cccccc;
+            border: 1px solid #3a3a3a;
+            border-radius: 3px;
+            padding: 2px 5px;
+        }
+        #customFormat, #prefixe, #suffixe, #couleurPlaque, #couleurTexte {
+            width: 100%;
+            margin-top: 10px;
+            background-color: #2a2a2a;
+            color: #cccccc;
+            border: 1px solid #3a3a3a;
+            border-radius: 3px;
+            padding: 5px;
+        }
+ 
+        #stats {
+            margin-top: 20px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div id="plaque" onclick="copierPlaque()">1234ABCD</div>
+        <div class="buttons">
+            <button onclick="genererPlaque()">Générer</button>
+            <button onclick="copierPlaque()">Copier</button>
+            <button onclick="inverserPlaque()">Inverser</button>
+            <button onclick="melanger()">Mélanger</button>
+            <button onclick="convertirEnMorse()">Morse</button>
+            <button onclick="genererPlaqueAleatoire()">Aléatoire</button>
+            <button onclick="ajouterEmoji()">Ajouter Emoji</button>
+            <button onclick="genererQRCode()">QR Code</button>
+            <button onclick="animer()">Animer</button>
+            <button onclick="genererSon()">Générer Son</button>
+        </div>
+        <div class="options">
+            <div class="option">
+                <input type="checkbox" id="separateur" onchange="genererPlaque()">
+                <label for="separateur">Séparateur</label>
+            </div>
+            <div class="option">
+                <input type="checkbox" id="tirets" onchange="genererPlaque()">
+                <label for="tirets">Tirets</label>
+            </div>
+            <div class="option">
+                <label for="longueurChiffres">Chiffres:</label>
+                <input type="number" id="longueurChiffres" min="1" max="6" value="4" onchange="genererPlaque()">
+            </div>
+            <div class="option">
+                <label for="longueurLettres">Lettres:</label>
+                <input type="number" id="longueurLettres" min="1" max="6" value="4" onchange="genererPlaque()">
+            </div>
+            <div class="option">
+                <label for="casse">Casse:</label>
+                <select id="casse" onchange="genererPlaque()">
+                    <option value="upper">Majuscules</option>
+                    <option value="lower">Minuscules</option>
+                    <option value="mixed">Mixte</option>
+                </select>
+            </div>
+            <div class="option">
+                <input type="checkbox" id="palindrome" onchange="genererPlaque()">
+                <label for="palindrome">Palindrome</label>
+            </div>
+            <div class="option">
+                <input type="checkbox" id="uniqueChars" onchange="genererPlaque()">
+                <label for="uniqueChars">Caractères uniques</label>
+            </div>
+            <div class="option">
+                <label for="pays">Pays:</label>
+                <select id="pays" onchange="genererPlaquePays()">
+                    <option value="aleatoire">Aléatoire</option>
+                    <!-- Les options seront ajoutées dynamiquement en JavaScript -->
+                </select>
+            </div>
+        </div>
+        <input type="text" id="customFormat" placeholder="Format personnalisé (ex: LL-NNN-LL)" onchange="genererPlaquePersonnalisee()">
+        <input type="text" id="prefixe" placeholder="Préfixe" onchange="genererPlaque()">
+        <input type="text" id="suffixe" placeholder="Suffixe" onchange="genererPlaque()">
+        <!-- <input type="color" id="couleurPlaque" value="#1c1c1c" onchange="changerCouleurPlaque()">
+        <input type="color" id="couleurTexte" value="#e0e0e0" onchange="changerCouleurTexte()"> -->
+        <div id="copyMessage">Plaque copiée !</div>
+        <div id="stats"></div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.0/dist/JsBarcode.all.min.js"></script>
+    <script>
+        let historiquePlaques = [];
+        let statsGenerees = 0;
+        let statsCopies = 0;
+
+        const formatsMondiaux = {
+            'France (actuel)': 'LL-NNN-LL',
+            'France (ancien)': 'NNN-LLL-NN',
+            'Allemagne': 'LL LL NNNN',
+            'Royaume-Uni': 'LL NN LLL',
+            'États-Unis (New York)': 'LLL-NNNN',
+            'Japon': 'NNN-LL NNNN',
+            'Italie': 'LL NNN LL',
+            'Espagne': 'NNNN LLL',
+            'Canada (Ontario)': 'LLLL NNN',
+            'Australie (New South Wales)': 'LL NN LL',
+            'Brésil': 'LLL-NNNN',
+            'Russie': 'L NNN LL NNN',
+            'Inde': 'LL NN LL NNNN',
+            'Chine': 'L·LLLNN',
+            'Afrique du Sud': 'LL NN LL GP',
+            'Mexique': 'LLL-NN-NN',
+            'Argentine': 'LL NNN LL',
+            'Pays-Bas': 'LL-NNN-L',
+            'Suède': 'LLL NNN',
+            'Pologne': 'LL NNNNN',
+            'Belgique': 'N-LLL-NNN',
+        };
+
+        function remplirSelecteurPays() {
+            const selecteur = document.getElementById('pays');
+            for (let pays in formatsMondiaux) {
+                let option = document.createElement('option');
+                option.value = pays;
+                option.textContent = pays;
+                selecteur.appendChild(option);
+            }
+        }
+
+        window.onload = function() {
+            remplirSelecteurPays();
+            // Autres initialisations si nécessaire
+        };
+
+        function genererPlaque() {
+            const chiffres = '0123456789';
+            const lettres = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+            let plaque = '';
+
+            const longueurChiffres = parseInt(document.getElementById('longueurChiffres').value);
+            const longueurLettres = parseInt(document.getElementById('longueurLettres').value);
+            const separateur = document.getElementById('separateur').checked;
+            const tirets = document.getElementById('tirets').checked;
+            const casse = document.getElementById('casse').value;
+            const palindrome = document.getElementById('palindrome').checked;
+            const uniqueChars = document.getElementById('uniqueChars').checked;
+            const prefixe = document.getElementById('prefixe').value;
+            const suffixe = document.getElementById('suffixe').value;
+
+            let caracteres = chiffres + (casse === 'lower' ? lettres.toLowerCase() : lettres);
+            if (uniqueChars) {
+                caracteres = shuffleString(caracteres);
+            }
+
+            for (let i = 0; i < longueurChiffres; i++) {
+                plaque += caracteres[Math.floor(Math.random() * 10)];
+            }
+
+            if (separateur) {
+                plaque += tirets ? '-' : ' ';
+            }
+
+            for (let i = 0; i < longueurLettres; i++) {
+                let lettre = caracteres[10 + Math.floor(Math.random() * 26)];
+                if (casse === 'mixed') {
+                    lettre = Math.random() > 0.5 ? lettre.toLowerCase() : lettre.toUpperCase();
+                }
+                plaque += lettre;
+            }
+
+            if (palindrome) {
+                plaque = plaque + plaque.split('').reverse().join('');
+            }
+
+            plaque = prefixe + plaque + suffixe;
+
+            afficherPlaque(plaque);
+            statsGenerees++;
+            mettreAJourStats();
+        }
+
+        function shuffleString(str) {
+            return str.split('').sort(() => Math.random() - 0.5).join('');
+        }
+
+        function genererPlaquePersonnalisee() {
+            const format = document.getElementById('customFormat').value;
+            let plaque = '';
+            for (let char of format) {
+                if (char === 'L') {
+                    plaque += 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.charAt(Math.floor(Math.random() * 26));
+                } else if (char === 'N') {
+                    plaque += Math.floor(Math.random() * 10);
+                } else {
+                    plaque += char;
+                }
+            }
+            afficherPlaque(plaque);
+        }
+
+        function afficherPlaque(plaque) {
+            const plaqueElement = document.getElementById('plaque');
+            plaqueElement.style.opacity = '0';
+            setTimeout(() => {
+                plaqueElement.textContent = plaque;
+                plaqueElement.style.opacity = '1';
+            }, 150);
+            ajouterAHistorique(plaque);
+        }
+
+        function copierPlaque() {
+            const plaque = document.getElementById('plaque').textContent;
+            navigator.clipboard.writeText(plaque).then(() => {
+                const copyMessage = document.getElementById('copyMessage');
+                copyMessage.style.opacity = '1';
+                setTimeout(() => {
+                    copyMessage.style.opacity = '0';
+                }, 2000);
+            });
+            statsCopies++;
+            mettreAJourStats();
+        }
+
+        function inverserPlaque() {
+            const plaqueElement = document.getElementById('plaque');
+            let plaque = plaqueElement.textContent;
+            plaque = plaque.split('').reverse().join('');
+            afficherPlaque(plaque);
+        }
+
+        function melanger() {
+            const plaqueElement = document.getElementById('plaque');
+            let plaque = plaqueElement.textContent;
+            plaque = plaque.split('').sort(() => Math.random() - 0.5).join('');
+            afficherPlaque(plaque);
+        }
+
+        function convertirEnLeetSpeak() {
+            const leetMap = {
+                'A': '4', 'B': '8', 'E': '3', 'G': '6', 'I': '1',
+                'O': '0', 'S': '5', 'T': '7', 'Z': '2'
+            };
+            const plaqueElement = document.getElementById('plaque');
+            plaque = plaque.split('').map(char => leetMap[char.toUpperCase()] || char).join('');
+            afficherPlaque(plaque);
+        }
+
+        function convertirEnMorse() {
+            const morseMap = {
+                'A': '.-', 'B': '-...', 'C': '-.-.', 'D': '-..', 'E': '.', 'F': '..-.',
+                'G': '--.', 'H': '....', 'I': '..', 'J': '.---', 'K': '-.-', 'L': '.-..',
+                'M': '--', 'N': '-.', 'O': '---', 'P': '.--.', 'Q': '--.-', 'R': '.-.',
+                'S': '...', 'T': '-', 'U': '..-', 'V': '...-', 'W': '.--', 'X': '-..-',
+                'Y': '-.--', 'Z': '--..', '0': '-----', '1': '.----', '2': '..---',
+                '3': '...--', '4': '....-', '5': '.....', '6': '-....', '7': '--...',
+                '8': '---..', '9': '----.'
+            };
+            const plaqueElement = document.getElementById('plaque');
+            let plaque = plaqueElement.textContent;
+            plaque = plaque.toUpperCase().split('').map(char => morseMap[char] || char).join(' ');
+            afficherPlaque(plaque);
+        }
+
+        function genererPlaqueAleatoire() {
+            const pays = Object.keys(formatsMondiaux)[Math.floor(Math.random() * Object.keys(formatsMondiaux).length)];
+            genererPlaquePays(pays);
+        }
+
+        function genererPlaquePays(paysForce = null) {
+            const selecteurPays = document.getElementById('pays');
+            let pays = paysForce || selecteurPays.value;
+            
+            if (pays === 'aleatoire') {
+                pays = Object.keys(formatsMondiaux)[Math.floor(Math.random() * Object.keys(formatsMondiaux).length)];
+            }
+            
+            const format = formatsMondiaux[pays];
+            document.getElementById('customFormat').value = format;
+            genererPlaquePersonnalisee();
+            
+            // Afficher le pays sélectionné
+            const plaqueElement = document.getElementById('plaque');
+            plaqueElement.title = `Format: ${pays}`;
+        }
+
+        function ajouterEmoji() {
+            const emojis = ['🚗', '🚕', '🚙', '🏎️', '🚓', '🚑', '🚒', '🚐', '🚚', '🚛', '🚜'];
+            const emojiAleat = emojis[Math.floor(Math.random() * emojis.length)];
+            const plaqueElement = document.getElementById('plaque');
+            let plaque = plaqueElement.textContent;
+            plaque += emojiAleat;
+            afficherPlaque(plaque);
+        }
+
+        function genererQRCode() {
+            const plaque = document.getElementById('plaque').textContent;
+            const qrDiv = document.createElement('div');
+            qrDiv.id = 'qrcode';
+            document.body.appendChild(qrDiv);
+            new QRCode(qrDiv, plaque);
+            qrDiv.style.position = 'fixed';
+            qrDiv.style.top = '50%';
+            qrDiv.style.left = '50%';
+            qrDiv.style.transform = 'translate(-50%, -50%)';
+            qrDiv.style.backgroundColor = 'white';
+            qrDiv.style.padding = '10px';
+            qrDiv.style.borderRadius = '5px';
+            qrDiv.onclick = () => document.body.removeChild(qrDiv);
+        }
+
+        function genererCodeBarre() {
+            const plaque = document.getElementById('plaque').textContent;
+            const svgDiv = document.createElement('div');
+            svgDiv.id = 'barcode';
+            document.body.appendChild(svgDiv);
+            JsBarcode("#barcode", plaque, {
+                format: "CODE128",
+                width: 2,
+                height: 100,
+                displayValue: true
+            });
+            svgDiv.style.position = 'fixed';
+            svgDiv.style.top = '50%';
+            svgDiv.style.left = '50%';
+            svgDiv.style.transform = 'translate(-50%, -50%)';
+            svgDiv.style.backgroundColor = 'white';
+            svgDiv.style.padding = '10px';
+            svgDiv.style.borderRadius = '5px';
+            svgDiv.onclick = () => document.body.removeChild(svgDiv);
+        }
+
+        function animer() {
+            const plaqueElement = document.getElementById('plaque');
+            plaqueElement.style.transition = 'transform 0.5s ease-in-out';
+            plaqueElement.style.transform = 'rotateY(360deg)';
+            setTimeout(() => {
+                plaqueElement.style.transition = 'none';
+                plaqueElement.style.transform = 'rotateY(0deg)';
+            }, 500);
+        }
+
+        function genererSon() {
+            const plaque = document.getElementById('plaque').textContent;
+            const utterance = new SpeechSynthesisUtterance(plaque);
+            window.speechSynthesis.speak(utterance);
+        }
+
+        function ajouterAHistorique(plaque) {
+            historiquePlaques.unshift(plaque);
+            if (historiquePlaques.length > 10) {
+                historiquePlaques.pop();
+            }
+            afficherHistorique();
+        }
+
+        function afficherHistorique() {
+            const historiqueElement = document.getElementById('historique');
+            historiqueElement.innerHTML = '';
+            historiquePlaques.forEach(plaque => {
+                const p = document.createElement('p');
+                p.textContent = plaque;
+                p.onclick = () => afficherPlaque(plaque);
+                historiqueElement.appendChild(p);
+            });
+        }
+
+        function mettreAJourStats() {
+            const statsElement = document.getElementById('stats');
+            statsElement.textContent = `Plaques générées : ${statsGenerees} | Plaques copiées : ${statsCopies}`;
+        }
+
+        function changerCouleurPlaque() {
+            const couleur = document.getElementById('couleurPlaque').value;
+            document.getElementById('plaque').style.backgroundColor = couleur;
+        }
+
+        function changerCouleurTexte() {
+            const couleur = document.getElementById('couleurTexte').value;
+            document.getElementById('plaque').style.color = couleur;
+        }
+    </script>
+</body>
+</html>
